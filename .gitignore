@@ -1,0 +1,48 @@
+#####################################################
+# Laravel
+
+### JS packages
+laravel/node_modules
+
+### PHP packages 
+laravel/vendor
+
+laravel/public/storage
+laravel/public/css/
+laravel/public/js/
+laravel/public/build/*
+laravel/public/assets
+
+laravel/public/backend/*
+laravel/public/mix-manifest.json
+
+laravel/public/img/*
+
+### Project settings
+laravel/.env
+
+### Storage
+laravel/storage/*.key
+laravel/storage/*
+laravel/resources/assets/css/backend/app.css
+laravel/resources/assets/js/dist/
+
+#########################################################
+# Docker
+
+### env file (only template is shared)
+.env
+
+### Database
+docker/mysql/databases
+
+### Certbot
+docker/certbot/conf
+docker/certbot/www
+
+#########################################################
+# IDE settings
+.vscode
+
+### MySQL dump files
+*.sql
