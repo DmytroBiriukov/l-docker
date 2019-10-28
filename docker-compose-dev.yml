@@ -4,57 +4,60 @@ services:
   app:
     container_name: ${PROJECT_ID}_app
     build: 
-      context: ./docker/php-fpm
+      context: ${DOCKER_CONFIG_PATH}/app
       args:
-        - PHP_FPM_VERSION=${PHP_FPM_VERSION}
+        - "PHP_FPM_VERSION:${PHP_FPM_VERSION}"
+        - "COMPOSER_VERSION:${COMPOSER_VERSION}"
     environment:
-      - "DOCKER_PHP_CONFIG=${DOCKER_PHP_CONFIG}"
-      - "DOCKER_XDEBUG=${DOCKER_XDEBUG}"
-      - "DOCKER_SUPERVISOR=${DOCKER_SUPERVISOR}"
-      - "DOCKER_CRON=${DOCKER_CRON}"
+      PROJECT_ID : ${PROJECT_ID}
+      DOCKER_PHP_CONFIG : ${DOCKER_PHP_CONFIG}
+      DOCKER_XDEBUG : ${DOCKER_XDEBUG}
+      DOCKER_XDEBUG_PORT : ${DOCKER_XDEBUG_PORT}
     depends_on:
      - mysql
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
     deploy:
       restart_policy:
-        condition: any #on-failure
+        condition: any 
         delay: 5s
         max_attempts: 3
-        window: 120s        
+        window: 120s      
 
   nginx:
     container_name: ${PROJECT_ID}_nginx
-    image: nginx:1.16-alpine   
+    image: nginx:1.16-alpine    
     depends_on:
       - app
     ports:
-      - "${DEV_NGINX_HOST_HTTP_PORT}:80"
+      - "${DEV_NGINX_HOST_HTTP_PORT}:80"      
       - "${DEV_NGINX_HOST_HTTPS_PORT}:443"
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
       - "${DOCKER_CONFIG_PATH}/nginx/conf-dev:/etc/nginx/conf.d"
     deploy:
       restart_policy:
-        condition: any #on-failure
+        condition: any 
         delay: 5s
         max_attempts: 3
-        window: 120s        
+        window: 120s      
 
   node:
-    container_name: ${PROJECT_ID}_nodejs
+    container_name: ${PROJECT_ID}_node
     build: 
-      context: ./docker/nodejs
+      context: ${DOCKER_CONFIG_PATH}/node
+      args:
+        - NODE_VERSION=${NODE_VERSION}
     depends_on:
       - app
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
     deploy:
       restart_policy:
-        condition: any #on-failure
+        condition: any 
         delay: 5s
         max_attempts: 3
-        window: 120s        
+        window: 120s      
 
   mysql:
     container_name: ${PROJECT_ID}_mysql
@@ -69,26 +72,34 @@ services:
       - "MYSQL_USER=${DB_USERNAME}"
       - "MYSQL_PASSWORD=${DB_PASSWORD}"
       - "SERVICE_NAME=mysql"
+    restart: unless-stopped
     tty: true 
+    ports:
+      - "${DB_EXTERNAL_PORT}:3306"
     volumes:
       - "${HOST_DATABASE_PATH}:/var/lib/mysql"
     deploy:
       restart_policy:
-        condition: any #on-failure
+        condition: any 
         delay: 5s
         max_attempts: 3
-        window: 120s        
-
-  beanstalkd:
-    container_name: ${PROJECT_ID}_beanstalkd
-    image: schickling/beanstalkd:latest
-    ports:
-      - "11300:11300"
+        window: 120s      
+       
+  supervisor:
+    container_name: ${PROJECT_ID}_supervisor
+    build: 
+      context: ${DOCKER_CONFIG_PATH}/supervisor 
+      args:
+        - PHP_VERSION=${PHP_FPM_VERSION}
     depends_on:
-      - app
+      - app 
+    volumes:
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
+      - "${DOCKER_CONFIG_PATH}/supervisor/supervisord.d:/etc/supervisord.d"   
+      - "${DOCKER_CONFIG_PATH}/supervisor/logs:/var/log/supervisor"
     deploy:
       restart_policy:
-        condition: any #on-failure
+        condition: any 
         delay: 5s
         max_attempts: 3
-        window: 120s        
+        window: 120s  

@@ -31,7 +31,7 @@ docker_remove_all:
 
 ### Workspace
 bash:
-	@docker-compose -f ${DOCKER_CONFIG} exec -u www -w ${NGINX_DOCUMENT_ROOT}/${PROJECT_ID} app sh
+	@docker-compose -f ${DOCKER_CONFIG} exec -u www -w ${NGINX_DOCUMENT_ROOT}/${PROJECT_ID} app bash
 
 ### MySQL -u root  -p root
 mysql:
@@ -42,6 +42,9 @@ mysqldump:
 
 mysql_import:
 	@docker-compose -f ${DOCKER_CONFIG} exec mysql mysql -u${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} ${DB_DATABASE} < ${DB_DATABASE}.sql;
+
+mysql_bash: # database command line
+	@docker-compose -f ${DOCKER_CONFIG} exec mysql bash
 
 ### Composer
 composer_install:
@@ -118,23 +121,12 @@ art_test: # run all tests
 art_queue_run: # usage example:  make art_queue_run queue=akeneo
 	@docker-compose -f ${DOCKER_CONFIG} exec -u www -w ${NGINX_DOCUMENT_ROOT}/${PROJECT_ID} app php artisan queue:work --queue=${queue} --tries=3 --timeout=0
 
-### connect services
-### nodejs
-connect_node: # node command line
+### Connect certain services
+connect_node: 
 	@docker-compose -f ${DOCKER_CONFIG} exec -u www -w ${NGINX_DOCUMENT_ROOT}/${PROJECT_ID} node sh
-### nginx
-connect_nginx: # nginx command line
-	@docker-compose -f ${DOCKER_CONFIG} exec -w /www nginx sh
-### MySQL
-connect_db: # database command line
-	@docker-compose -f ${DOCKER_CONFIG} exec mysql bash
 
-### NGINX
-nginx_reload:
-	@docker-compose exec nginx nginx -s reload
-
-nginx_test:
-	@docker-compose exec nginx nginx -t
+connect_nginx:
+	@docker-compose -f ${DOCKER_CONFIG} exec -w ${NGINX_DOCUMENT_ROOT}/${PROJECT_ID} nginx sh
 
 ### Rebuild certain services
 rebuild_app:
@@ -149,9 +141,16 @@ rebuild_node:
 rebuild_supervisor:
 	@docker-compose up -d --no-deps --build supervisor
 
+### NGINX
+nginx_reload:
+	@docker-compose exec nginx nginx -s reload
+
+nginx_test:
+	@docker-compose exec nginx nginx -t
+
 ### Supervisor
 supervisorctl_restart_all:
 	@docker-compose -f ${DOCKER_CONFIG} exec supervisor supervisorctl restart all	
 
 supervisorctl_stop_all:
-	@docker-compose -f ${DOCKER_CONFIG} exec supervisor supervisorctl stop all
+	@docker-compose -f ${DOCKER_CONFIG} exec supervisor supervisorctl stop all	

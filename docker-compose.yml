@@ -45,7 +45,7 @@ services:
     build: 
       context: ${DOCKER_CONFIG_PATH}/mysql
       args:
-        - MYSQL_VERSION=${MYSQL_VERSION} 
+        - "MYSQL_VERSION=${MYSQL_VERSION}"
     environment:
       - "MYSQL_ROOT_HOST=%"
       - "MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
@@ -59,6 +59,7 @@ services:
       - "${DB_EXTERNAL_PORT}:3306"
     volumes:
       - "${HOST_DATABASE_PATH}:/var/lib/mysql"    
+      - "${DOCKER_CONFIG_PATH}/mysql/initdb:/docker-entrypoint-initdb.d"
        
   supervisor:
     container_name: ${PROJECT_ID}_supervisor

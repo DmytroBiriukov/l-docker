@@ -11,44 +11,41 @@ done
 
 echo "So here we are go!\n"
 
-make art_down
+make -C ../ art_down
 
 read -r -p "Would you like to refresh DATABASE? [Y/n]" response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]] || [[ -z $response ]]; then
-    make art_fresh
+    make -C ../  art_fresh
 fi
 
 read -r -p "Would you like to delete MEDIA files? [Y/n]" response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]] || [[ -z $response ]]; then
-    sudo rm -R laravel/public/media/*
-    sudo rm -R laravel/storage/medialibrary/temp/*
+    sudo rm -R ../laravel/public/media/*
+    sudo rm -R ../laravel/storage/medialibrary/temp/*
 fi
 
 read -r -p "Would you like to delete CACHE/SESSION/VIEWS files? [Y/n]" response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]] || [[ -z $response ]]; then
-    make art_cache_clear
-    make art_config_clear
-    make art_view_clear   
-    make art_route_clear     
-    sudo rm -R laravel/storage/framework/cache/*
-    sudo rm -R laravel/storage/framework/sessions/*
-    sudo rm -R laravel/storage/framework/views/*    
+    make -C ../  art_cache_clear
+    make -C ../  art_config_clear
+    make -C ../  art_view_clear   
+    make -C ../  art_route_clear      
 fi
 
 read -r -p "Would you like to delete LOGS? [Y/n]" response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]] || [[ -z $response ]]; then
-    sudo rm -R laravel/storage/logs/*
-    sudo rm -R docker/supervisor/logs/*
+    sudo rm -R ../laravel/storage/logs/*
+    sudo rm -R ../docker/supervisor/logs/*
 fi
 
 read -r -p "Would you like to restart SUPERVISOR? [Y/n]" response
 response=${response,,}
 if [[ $response =~ ^(yes|y| ) ]] || [[ -z $response ]]; then
-    make supervisorctl_restart_all
+    make -C ../  supervisorctl_restart_all
 fi
 
-make art_up
+make -C ../  art_up

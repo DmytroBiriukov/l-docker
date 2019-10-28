@@ -1,22 +1,27 @@
 #####################################################
 # Laravel
 
+### temporary
+laravel/*
+
 ### JS packages
 laravel/node_modules
 
 ### PHP packages 
 laravel/vendor
 
+### Built folders and files 
 laravel/public/storage
-laravel/public/css/
-laravel/public/js/
-laravel/public/build/*
 laravel/public/assets
+laravel/public/frontend
+laravel/public/backend
+laravel/public/css
+laravel/public/js
+laravel/public/build
+laravel/public/img
+laravel/public/images
 
-laravel/public/backend/*
 laravel/public/mix-manifest.json
-
-laravel/public/img/*
 
 ### Project settings
 laravel/.env
@@ -40,9 +45,13 @@ docker/mysql/databases
 docker/certbot/conf
 docker/certbot/www
 
+### Logs
+docker/supervisor/logs
+
 #########################################################
 # IDE settings
 .vscode
 
 ### MySQL dump files
 *.sql
+!docker/mysql/initdb/*.sql

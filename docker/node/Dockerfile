@@ -1,19 +1,15 @@
-FROM node:11.15-alpine
+ARG NODE_VERSION=10.16
+
+FROM node:${NODE_VERSION}-alpine
 
 RUN apk add git
 
-#
-# Configure user
-#
+### Configure user
 ENV DOCKER_USER=www
-
 ARG DOCKER_UID=1000
 ARG DOCKER_GID=1000
 
-
-#
-# Add host user and group into container
-#
+### Add host user and group into container
 RUN set -xe \
 		&& deluser node \
 		&& addgroup -g $DOCKER_GID $DOCKER_USER \
@@ -23,7 +19,5 @@ RUN set -xe \
 
 WORKDIR /var/www
 
-#
-# Do not stop container, and handle SIGTERM from docker stop or down
-#
+### Do not stop container, and handle SIGTERM from docker stop or down
 CMD node -e 'setInterval(() => {}, 60000); process.on("SIGTERM", () => { process.exit(0); });'

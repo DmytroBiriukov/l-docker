@@ -48,9 +48,14 @@ RUN set -xe \
 			gd \
 		&& pecl install xdebug-2.6.1 \
 			imagick \
-	 	&& docker-php-ext-enable \
-		 	imagick \	
-		&& rm -rf /usr/src/* /tmp/* 		
+		&& docker-php-ext-enable \
+			imagick \	
+		&& rm -rf /usr/src/* /tmp/*
+
+
+RUN set -xe \		
+	&& echo -e "memory_limit=4092M\n" > /usr/local/etc/php/conf.d/memory.ini \
+	&& echo -e "max_execution_time=0\n" > /usr/local/etc/php/conf.d/max_execution_time.ini				
 
 ### Configure user
 ENV DOCKER_USER=www
@@ -58,10 +63,10 @@ ARG DOCKER_UID=1000
 ARG DOCKER_GID=1000
 ### Add host user and group into container
 RUN set -xe \
-		&& addgroup -g $DOCKER_GID $DOCKER_USER \
-		&& adduser -g "web user" -s /bin/sh -D -u $DOCKER_UID -G $DOCKER_USER $DOCKER_USER \
-		&& delgroup $DOCKER_USER $DOCKER_USER \
-		&& echo "$DOCKER_USER:$DOCKER_USER" | chpasswd
+	&& addgroup -g $DOCKER_GID $DOCKER_USER \
+	&& adduser -g "web user" -s /bin/sh -D -u $DOCKER_UID -G $DOCKER_USER $DOCKER_USER \
+	&& delgroup $DOCKER_USER $DOCKER_USER \
+	&& echo "$DOCKER_USER:$DOCKER_USER" | chpasswd
 
 ###############################################################
 ENV PUID ${DOCKER_UID}
