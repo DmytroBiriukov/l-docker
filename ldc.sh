@@ -103,7 +103,7 @@ else
             DOCKER_COMPOSE_FILE_FLAGS="-f docker-compose.yml -f docker-compose-prod.yml"
             ;;
         *)
-            echo "Only [local|development|production] environments are supported"
+            echo -e "\e[31mOnly [local|development|production] environments are supported!"
             exit 1
             ;;    
     esac

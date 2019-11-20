@@ -17,7 +17,7 @@ services:
     depends_on:
      - mysql
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
     
   nginx:
     container_name: ${PROJECT_ID}_nginx
@@ -25,7 +25,7 @@ services:
     depends_on:
       - app    
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"      
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
     
   node:
     container_name: ${PROJECT_ID}_node
@@ -36,7 +36,7 @@ services:
     depends_on:
       - app
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
 
   mysql:
     container_name: ${PROJECT_ID}_mysql
@@ -64,6 +64,6 @@ services:
     depends_on:
       - app 
     volumes:
-      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}/${PROJECT_ID}"
+      - "${HOST_DOCUMENT_ROOT}:${NGINX_DOCUMENT_ROOT}"
       - "${DOCKER_CONFIG_PATH}/supervisor/supervisord.d:/etc/supervisord.d"   
       - "${DOCKER_CONFIG_PATH}/supervisor/logs:/var/log/supervisor"

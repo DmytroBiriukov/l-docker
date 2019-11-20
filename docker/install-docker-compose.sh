@@ -25,6 +25,7 @@ echo "Downloading sources"
 sudo curl -L -o app/source/wkhtmltopdf.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
 
 echo "Enabling Helper script"
-sudo chmod +x ../ldc.sh
-sudo chmod +x ../ldc-completion.sh
-source ../ldc-completion.sh
+cd ../
+sudo chmod +x ldc.sh
+sudo chmod +x ldc-completion.sh
+source ldc-completion.sh
