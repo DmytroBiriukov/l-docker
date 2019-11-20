@@ -13,6 +13,7 @@ There are several `docker-compose` files for local (developer computer), develop
 ### Install tools
 
 Connect to deployment server. Just before install tools, lets generate public key.
+> cd ~/
 > mkdir .ssh
 > cd ~/.ssh && ls -l
 > ssh-keygen -b 4096
@@ -30,7 +31,7 @@ We prepared `install-docker.sh` and `install-docker-composer.sh` scripts that ex
 
 > sudo chmod +x install-docker.sh
 
-Then run `install-docker.sh` and `install-docker-composer.sh` one by one.
+Then run `install-docker.sh` and `install-docker-composer.sh` one by one. The first script will make the second executable, but you still have to run both scripts. 
 
 ### Docker .env
 
@@ -65,11 +66,20 @@ To initialize your database from `.sql` dump file, just copy dump file into  `./
 
 #### Supervisorctl
 
-To manage Laravel queues with `supervisorctl` you have to specify configuration file for each queue, and store it in `./docker/supervisor/supervisord.d`. In this forlder you will find `default.conf` for default queue, as well as 2 extra configuration files (you may use these 2 files as configuration examples or just delete them).
+To manage Laravel queues with `supervisorctl` you have to specify configuration file for each queue, and store it in `./docker/supervisor/supervisord.d`. In this forlder you will find `default.conf` for default queue, as well as 2 extra configuration files (you may use these 2 files as configuration examples or just delete them). 
+Don't forget to specify correct path for `php artisan queue` command in configuration files (replace `l-docker` with you project name). 
 
-All supervisor logs are reccomended to store in `./docker/supervisor/logs` folder that is available for host.
+All supervisor logs are recommended to store in `./docker/supervisor/logs` folder that is available for host.
 
 **Note, as far supervisor has separate container all neccessary php extentions should be installed in order to perform certain jobs in queues.**
+
+There are several supervisorctl commands available through `Makefile`^
+
+> make supervisor restart_all 
+
+> make supervisor stop_all
+
+> make supervisor update_all
 
 ### Build and up docker containers
 
@@ -133,3 +143,33 @@ DB_PASSWORD=secret
 > make npm_install
 > make npm_run_dev
 > make npm_run_prod
+
+#### Laravel scheduler
+
+In order to use Laravel scheduler, the necessary entry was added to `Cron` on `app` container. It looks like
+
+```
+* * * * * php /var/www/l-docker/artisan schedule:run >> /dev/null 2>&1
+```
+
+while `l-docker` is replaced by you project name (`PROJECT_ID`) taken from `.env'.
+
+
+
+
+
+### Helper script
+
+To ease your work with dockerized laravel project we prepared helper script `ld.sh`.
+Also there is autocompletion for this script, you have to anable autocomletion by running
+
+```
+source ld-completion.sh
+```
+
+Dont forget to make `ld.sh` executable 
+
+```
+sudo chmod +x ld.sh
+```
+

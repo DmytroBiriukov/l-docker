@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+   
+  nginx:
+    ports:
+      - "${LOCAL_NGINX_HOST_HTTP_PORT}:80"      
+    volumes:      
+      - "${DOCKER_CONFIG_PATH}/nginx/conf-dev:/etc/nginx/conf.d"
+    
+  mysql:
+    ports:
+      - "${DB_EXTERNAL_PORT}:3306"      

@@ -60,7 +60,9 @@ RUN set -xe \
 RUN set -xe \
 		&& apk add --no-cache \
 			zip \
-			nano
+			nano \
+			bash
+
 ### Configure user
 ENV DOCKER_USER=www
 
@@ -74,8 +76,9 @@ RUN set -xe \
 		&& delgroup $DOCKER_USER $DOCKER_USER \
 		&& echo "$DOCKER_USER:$DOCKER_USER" | chpasswd
 
+ENV PROJECT_ID=l-docker
 ### Set working directory
-WORKDIR /var/www/bluk
+WORKDIR /var/www/$PROJECT_ID
 
 #
 # Run php-fpm with docker user
@@ -97,6 +100,16 @@ RUN set -xe \
 		&& echo -e "curl.cainfo=\"/etc/ssl/certs/cacert.pem\"\n" > /usr/local/etc/php/conf.d/curl_cainfo.ini \
 		&& echo -e "extension=$(find /usr/local/lib/php/extensions/ -name gd.so)\n" > /usr/local/etc/php/conf.d/docker-php-ext-gd.ini 		
 
+# Download, extract and move binary in place
+COPY source/ .
+RUN tar -xf wkhtmltopdf.tar.xz
+RUN cp wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+RUN cp wkhtmltox/bin/wkhtmltoimage  /usr/local/bin/wkhtmltoimage
+
+RUN chmod +x /usr/local/bin/wkhtmltopdf
+RUN chmod +x /usr/local/bin/wkhtmltoimage
+
+
 ### Extend entry point
 COPY docker-ep-extra.sh /
 
@@ -104,8 +117,5 @@ RUN set -xe \
 		&& sed -i '/^set -e/r /docker-ep-extra.sh' /usr/local/bin/docker-php-entrypoint \
 		&& rm -f /docker-ep-extra.sh
 
-# Download, extract and move binary in place
-RUN curl -L -o wkhtmltopdf.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
-RUN tar -xf wkhtmltopdf.tar.xz
-RUN mv wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
-RUN chmod +x /usr/local/bin/wkhtmltopdf
+# Cron tasks
+RUN chmod -R 644 /etc/crontabs 
