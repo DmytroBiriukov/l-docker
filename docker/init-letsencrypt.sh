@@ -1,11 +1,14 @@
 #!/bin/bash
 
+DOMAINS_FILE="./domains.txt"
+read -d $'\x04' DOMAINS < "$DOMAINS_FILE"
+
 if ! [ -x "$(command -v docker-compose)" ]; then
   echo 'Error: docker-compose is not installed.' >&2
   exit 1
 fi
 
-domains=(laravel.project laravel.project)
+domains=($DOMAINS)
 rsa_key_size=4096
 data_path="./docker/certbot"
 email="your.email@email.provider" 

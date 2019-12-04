@@ -13,5 +13,5 @@ fi
 
 if [ "$DOCKER_CRON" != "" ]
 then    		
-	echo -e "* * * * * php /var/www/$PROJECT_ID/artisan schedule:run >> /dev/null 2>&1"  >> /etc/crontabs/root	
+	echo -e "* * * * * php /var/www/l-docker/artisan schedule:run >> /dev/null 2>&1"  >> /etc/crontabs/root	
 fi

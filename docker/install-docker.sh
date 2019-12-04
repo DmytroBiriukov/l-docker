@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Install a few prerequisite packages"
-sudo apt update && apt install apt-transport-https ca-certificates make curl git software-properties-common
+sudo apt update && apt install apt-transport-https ca-certificates curl git software-properties-common
 
 
 if ! [ -x "$(command -v docker)" ]; then

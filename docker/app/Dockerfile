@@ -61,7 +61,11 @@ RUN set -xe \
 		&& apk add --no-cache \
 			zip \
 			nano \
-			bash
+			bash 
+
+RUN set -xe \
+		&& apk add --no-cache \
+			wkhtmltopdf
 
 ### Configure user
 ENV DOCKER_USER=www
@@ -100,15 +104,12 @@ RUN set -xe \
 		&& echo -e "curl.cainfo=\"/etc/ssl/certs/cacert.pem\"\n" > /usr/local/etc/php/conf.d/curl_cainfo.ini \
 		&& echo -e "extension=$(find /usr/local/lib/php/extensions/ -name gd.so)\n" > /usr/local/etc/php/conf.d/docker-php-ext-gd.ini 		
 
-# Download, extract and move binary in place
+### Download, extract and move binary in place
 COPY source/ .
-RUN tar -xf wkhtmltopdf.tar.xz
-RUN cp wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
-RUN cp wkhtmltox/bin/wkhtmltoimage  /usr/local/bin/wkhtmltoimage
-
-RUN chmod +x /usr/local/bin/wkhtmltopdf
-RUN chmod +x /usr/local/bin/wkhtmltoimage
-
+### For example if you need to copy archived wkhtmltopdf into /usr/local/bin inside container  
+#RUN tar -xf wkhtmltopdf.tar.xz
+#RUN cp wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+#RUN chmod +x /usr/local/bin/wkhtmltopdf
 
 ### Extend entry point
 COPY docker-ep-extra.sh /

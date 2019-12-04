@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dockerized XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9099,
+            "pathMappings": {
+                "/var/www/l-docker/": "${workspaceFolder}/laravel"
+            },
+        }
+    ]
+}

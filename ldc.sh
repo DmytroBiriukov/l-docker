@@ -285,6 +285,13 @@ else
         cron_l)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec app crontab -l
             ;;
+### Custom commands
+### suppose you have "akeneo:sync" command in your Akeneo project
+### you may call it 
+        akeneo-sync) # usage example:  make art_queue_run queue=akeneo
+            docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan akeneo:sync
+            ;;    
+### finally, if you misspell command                    
         *)            
             echo -e "\e[31mWrong command supplied!" 
             show_allowed_commands

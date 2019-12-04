@@ -1,7 +1,8 @@
 #####################################################
 # Laravel
 
-### temporary
+### Laravel project
+# You will delete this line as soon your real Laravel project will be copied into directory `laravel`
 laravel/*
 
 ### JS packages
@@ -10,7 +11,7 @@ laravel/node_modules
 ### PHP packages 
 laravel/vendor
 
-### Built folders and files 
+### Built folders and files
 laravel/public/storage
 laravel/public/assets
 laravel/public/frontend
@@ -39,18 +40,19 @@ laravel/resources/assets/js/dist/
 .env
 
 ### Database
-docker/mysql/databases
+docker/mysql/databases/*
 
 ### Certbot
 docker/certbot/conf
 docker/certbot/www
 
 ### Logs
-docker/supervisor/logs
+docker/supervisor/logs/*
 
 #########################################################
-# IDE settings
-.vscode
+### IDE settings
+### You may want to uncomment next line
+#.vscode
 
 ### MySQL dump files
 *.sql
