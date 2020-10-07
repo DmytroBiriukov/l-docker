@@ -1,5 +1,10 @@
 #!/bin/bash
 
+source ../.env
+
+echo -e "\e[39mLaravel project : \e[33m"$PROJECT_ID
+echo -e "\e[39mEnvironment : \e[33m"$DOCKER_ENVIRONMENT
+
 DOMAINS_FILE="./domains.txt"
 read -d $'\x04' DOMAINS < "$DOMAINS_FILE"
 
@@ -39,11 +44,11 @@ docker-compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:1024 -days 1\
     -keyout '$path/privkey.pem' \
     -out '$path/fullchain.pem' \
-    -subj '/CN=localhost'" certbot
+    -subj '/CN=localhost'" ${PROJECT_ID}_certbot
 echo
 
 echo "### Starting nginx ..."
-docker-compose up --force-recreate -d nginx
+docker-compose up --force-recreate -d ${PROJECT_ID}_nginx
 echo
 
 echo "### Deleting dummy certificate for $domains ..."
@@ -76,8 +81,8 @@ docker-compose run --rm --entrypoint "\
     $domain_args \
     --rsa-key-size $rsa_key_size \
     --agree-tos \
-    --force-renewal" certbot
+    --force-renewal" ${PROJECT_ID}_certbot
 echo
 
 echo "### Reloading nginx ..."
-docker-compose exec nginx nginx -s reload
+docker-compose exec ${PROJECT_ID}_nginx nginx -s reload

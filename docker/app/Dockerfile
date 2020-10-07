@@ -111,6 +111,9 @@ COPY source/ .
 #RUN cp wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
 #RUN chmod +x /usr/local/bin/wkhtmltopdf
 
+RUN docker-php-ext-install opcache
+COPY docker/app/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
 ### Extend entry point
 COPY docker-ep-extra.sh /
 

@@ -9,8 +9,8 @@ echo -e "\e[39mEnvironment : \e[33m"$DOCKER_ENVIRONMENT
 COMMANDS_FILE="./docker/command-list.txt"
 read -d $'\x04' COMMANDS < "$COMMANDS_FILE"
 
-function show_allowed_commands() {    
-    echo -e "\e[31m Allowed commands are:"    
+function show_allowed_commands() {
+    echo -e "\e[31m Allowed commands are:"
     echo -e "\e[93m "$COMMANDS"\e[39m"
 }
 
@@ -83,13 +83,13 @@ function test_containers() {
 
 
 if [ -z "$1" ]; then
-    echo -e "\e[31mNo command supplied!"    
+    echo -e "\e[31mNo command supplied!"
     show_allowed_commands
     exit 1
 else
     echo -e "\e[39mCommand : \e[33m"$1
-    echo -e "\e[39m"   
-    
+    echo -e "\e[39m"
+
     DOCKER_COMPOSE_FILE_FLAGS="-f docker-compose.yml"
 
     case $DOCKER_ENVIRONMENT in
@@ -98,27 +98,27 @@ else
             ;;
         development)
             DOCKER_COMPOSE_FILE_FLAGS="-f docker-compose.yml -f docker-compose-dev.yml"
-            ;;        
+            ;;
         production)
             DOCKER_COMPOSE_FILE_FLAGS="-f docker-compose.yml -f docker-compose-prod.yml"
             ;;
         *)
             echo -e "\e[31mOnly [local|development|production] environments are supported!"
             exit 1
-            ;;    
+            ;;
     esac
 
     PARAMETER_REQUIRED="art-make-controller art-make-model art-make-migration art-make-seeder art-queue-run"
 
     if [[ " $PARAMETER_REQUIRED " =~ .*\ $1\ .* ]]; then
-        if [ -z "$2" ]; then            
+        if [ -z "$2" ]; then
             echo -e "\e[31mSecond parameter is required!" 
             exit 1
         fi
     fi 
 
-    case "$1" in   
-        refresh-project)     
+    case "$1" in
+        refresh-project)
             refresh_project
             ;;
         build)
@@ -126,24 +126,24 @@ else
             ;;
         start)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS start
-            ;; 
+            ;;
         stop)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS stop
-            ;;                       
+            ;;
         up)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS up -d
             echo ""
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS ps
-            ;;         
+            ;;
         down)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS down
             ;;
         down-volume)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS down -v
-            ;;            
+            ;;
         ps)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS ps
-            ;;         
+            ;;
         docker-stop-all)
         	docker stop $(docker ps -a -q)
             ;;
@@ -156,12 +156,15 @@ else
         bash)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app sh
             ;;
-#mysql            
+        root-bash)
+	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u root -w / app bash
+            ;;
+#mysql
         mysql)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec mysql mysql -u$DB_ROOT_USERNAME -p$DB_ROOT_PASSWORD
             ;;
         mysqldump)
-	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec mysql mysqldump $DB_DATABASE -u $DB_USERNAME -p  --result-file=$(shell date -d "$xx day" -u +%Y-%m-%d)-$DB_DATABASE.sql
+	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec mysql mysqldump $DB_DATABASE -u $DB_USERNAME -p  --result-file=/docker-entrypoint-initdb.d/$DB_DATABASE-$(date -d "$xx day" -u +%Y-%m-%d).sql
             ;;
         mysql-import)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec mysql mysql -u$DB_ROOT_USERNAME -p$DB_ROOT_PASSWORD $DB_DATABASE < $DB_DATABASE.sql;
@@ -169,7 +172,7 @@ else
         mysql-bash)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec mysql bash
             ;;
-#composer            
+#composer
         composer-install)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app composer install
             ;;
@@ -205,13 +208,13 @@ else
         art-config-clear)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan config:clear
             ;;
-        art-cache-clear) 
+        art-cache-clear)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan cache:clear
             ;;
         art-view-clear)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan view:clear
             ;;
-        art-route-clear) 
+        art-route-clear)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan route:clear
             ;;
         art-up)
@@ -222,6 +225,9 @@ else
             ;;
         art-key)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan key:generate
+            ;;
+        art-migrate)
+            docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan migrate
             ;;
         art-fresh) # refresh the database and run all database seeds
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan migrate:fresh --seed
@@ -281,21 +287,21 @@ else
         supervisorctl-update-all)
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec supervisor supervisorctl update all
             ;;
-### Cron            
-        cron_l)
+### Cron
+        cron-l)
 	        docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec app crontab -l
             ;;
 ### Custom commands
 ### suppose you have "akeneo:sync" command in your Akeneo project
-### you may call it 
+### you may call it
         akeneo-sync) # usage example:  make art_queue_run queue=akeneo
             docker-compose $DOCKER_COMPOSE_FILE_FLAGS exec -u www -w $NGINX_DOCUMENT_ROOT app php artisan akeneo:sync
-            ;;    
-### finally, if you misspell command                    
-        *)            
-            echo -e "\e[31mWrong command supplied!" 
+            ;;
+### finally, if you misspell command
+        *)
+            echo -e "\e[31mWrong command supplied!"
             show_allowed_commands
             exit 1
             ;;
-    esac    
+    esac
 fi
